@@ -1,0 +1,148 @@
+% \iffalse meta-comment
+% 
+% Copyright (C) 2013 by Carsten Burgard
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either
+% version 1.2 of this license or (at your option) any later
+% version. The latest version of this license is in:
+% 
+%     http://www.latex-project.org/lppl.txt
+% 
+% and version 1.2 or later is part of all distributions of
+% LaTeX version 1999/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<package>\ProvidesPackage{footsave}
+%<package> [2012/05/23 v1.0 A minimalist package for easy, automatic data tables and lists]
+%
+%
+%<*driver>
+\documentclass{ltxdoc}
+\setlength{\parskip}{3pt}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setcounter{dbltopnumber}{2}
+\renewcommand{\topfraction}{0.9}	
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+% \OnlyDescription
+\DocInput{footsave.dtx}
+\end{document}
+%</driver> 
+% \fi 
+% \CheckSum{0} 
+% \changes{v1.0}{2012/05/23}{Original Version}
+% \GetFileInfo {footsave.sty}
+% \DoNotIndex{\#,\$,\%,\&,\@,\\,\{,\},\^,\_,\~,\,,\=,\>}
+% \DoNotIndex{\@ne}
+% \DoNotIndex{\advance,\begingroup,\catcode,\closein}
+% \DoNotIndex{\closeout,\day,\def,\edef,\else,\empty,\endgroup}
+%
+% \title{The \textsf{ footsave } package
+% \thanks{This document corresponds to \textsf{datablist} ~\fileversion, dated~\filedate.}}
+%
+% \author{ Carsten Burgard \\ \texttt{ carsten.burgard@gmail.com }}
+%
+% \maketitle 
+%
+% \begin{abstract} 
+
+% This package offers support for hyperlinked, reoccuring
+% footnotes. The package code itself is quite minimal, and most of the
+% work is done by the |hyperref| package.
+
+% \end {abstract}
+%
+% \section{Introduction} 
+
+% The |hyperref| package offers outstanding support of
+% footnotes. However, reoccurence of footnotes can mess up hyperlinks
+% quite badly and is not supported by default. There are some guides
+% on how to achieve flawless footnote reoccurence within a document,
+% and this package implements one of them.
+
+%
+% \section{Implementation}
+%
+%
+% \begin{macro}{footsave@s@ved}
+
+% We need a counter to store the footnote numbers while we change them
+% to achieve reoccuring footnotes.
+
+%    \begin{macrocode}
+\newcounter{footsave@s@ved}
+%    \end{macrocode}
+% \end{macro}
+
+
+% \begin{macro}{\createfootnote}
+
+% With |\createfootnote{|\meta{label}|}{|\meta{text}|}|, we can create
+% a footnote. It will be inserted at the given position, just like
+% using the regular |\footnote| command.
+
+%    \begin{macrocode}
+\newcommand{\createfootnote}[2]{%
+  \newcounter{footsave@#1}%
+  \setcounter{footsave@#1}{\value{footnote}}%
+  \expandafter\gdef\csname text@footsave@#1\endcsname{#2}%
+  \footnotemark%
+  \@ifundefined{hyper@@anchor}{}{%
+    \expandafter\let\csname saved@Href@#1\endcsname\Hy@footnote@currentHref%
+    \expandafter\let\expandafter\Hy@footnote@currentHref \csname saved@Href@#1\endcsname%    
+  }%
+  \footnotetext{#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+
+
+% \begin{macro}{\createfootnote}
+
+% With |\recallfootnote{|\meta{label}|}|, we can access the reference
+% number of footnote \meta{label} and insert another reference to it,
+% including the hyperlink, which will lead to the original place of
+% occurence.
+
+%    \begin{macrocode}
+\newcommand{\recallfootnote}[1]{%
+  \setcounter{footsave@s@ved}{\value{footnote}}%
+  \setcounter{footnote}{\value{footsave@#1}}%
+  \@ifundefined{hyper@@anchor}{}{%
+    \setcounter{Hfootnote}{\value{footsave@#1}}% 
+  }%
+  \footnotemark%
+  \setcounter{footnote}{\value{footsave@s@ved}}%
+}
+%    \end{macrocode}
+% \end{macro}
+
+% \begin{macro}{\recallfootnote}
+
+% With |\recallfootnote{|\meta{label}|}|, we can access the text of
+% footnote \meta{label} and reprint it, with a new number and a
+% correct hyperlink. The text, however, will be identical, so that you
+% only need to put it into your document once.
+
+%    \begin{macrocode}
+\newcommand{\reprintfootnote}[1]{%
+  \footnotemark%
+  \footnotetext{\csname text@footsave@#1\endcsname}%
+}
+%    \end{macrocode}
+% \end{macro}
+
+% \PrintChanges
+% \PrintIndex
+% \Finale
+% \endinput
