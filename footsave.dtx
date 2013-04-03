@@ -81,6 +81,7 @@
 
 %    \begin{macrocode}
 \newcounter{footsave@s@ved}
+\newcounter{footsave@Hs@ved}
 %    \end{macrocode}
 % \end{macro}
 
@@ -94,12 +95,16 @@
 %    \begin{macrocode}
 \newcommand{\createfootnote}[2]{%
   \newcounter{footsave@#1}%
+  \@ifundefined{hyper@@anchor}{}{%
+    \newcounter{footsave@Href@#1}%
+    \setcounter{footsave@Href@#1}{\value{Hfootnote}}%
+  }%
   \setcounter{footsave@#1}{\value{footnote}}%
   \expandafter\gdef\csname text@footsave@#1\endcsname{#2}%
   \footnotemark%
   \@ifundefined{hyper@@anchor}{}{%
     \expandafter\let\csname saved@Href@#1\endcsname\Hy@footnote@currentHref%
-    \expandafter\let\expandafter\Hy@footnote@currentHref \csname saved@Href@#1\endcsname%    
+    \expandafter\let\expandafter\Hy@footnote@currentHref\csname saved@Href@#1\endcsname%    
   }%
   \footnotetext{#2}%
 }
@@ -119,7 +124,8 @@
   \setcounter{footsave@s@ved}{\value{footnote}}%
   \setcounter{footnote}{\value{footsave@#1}}%
   \@ifundefined{hyper@@anchor}{}{%
-    \setcounter{Hfootnote}{\value{footsave@#1}}% 
+    \setcounter{footsave@Hs@ved}{\value{Hfootnote}}%
+    \setcounter{Hfootnote}{\value{footsave@Href@#1}}% 
   }%
   \footnotemark%
   \setcounter{footnote}{\value{footsave@s@ved}}%
